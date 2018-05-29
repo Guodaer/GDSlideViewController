@@ -7,7 +7,10 @@
 //
 
 #import "ViewController.h"
-
+#import "oneView.h"
+#import "TwoView.h"
+#import "ThreeViewController.h"
+#import "FourViewController.h"
 @interface ViewController ()
 
 @end
@@ -17,6 +20,30 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    NSLog(@"|]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]");
+
+    oneView *one = [[oneView alloc] init];
+    oneView *oneS = [[oneView alloc] init];
+    TwoView *two = [[TwoView alloc] init];
+    TwoView *twos = [[TwoView alloc] init];
+    ThreeViewController *three = [[ThreeViewController alloc] init];
+    ThreeViewController *threes = [[ThreeViewController alloc] init];
+    FourViewController *four = [[FourViewController alloc] init];
+    FourViewController *fours = [[FourViewController alloc] init];
+    
+    GDScrollPageView *pageview = [[GDScrollPageView alloc] initWithFrame:CGRectMake(0, 20, self.view.frame.size.width, self.view.frame.size.height-20)];
+    pageview.superVC = self;
+    pageview.titles = @[@"one",@"two",@"three",@"four",@"five",@"six",@"seven",@"eight"];
+    pageview.controllers = @[one,two,three,four,oneS,twos,threes,fours];
+    pageview.bottomLine_color = [UIColor blackColor];
+//    pageview.currentIndex = 1;
+//    pageview.topDisPlayCount = 9;
+          NSLog(@"||||||||||||||||||||||||||||||||");
+
+    [self.view addSubview:pageview];
+    [pageview loadScrollView];
+    NSLog(@"111111110000000000000");
+    
 }
 
 

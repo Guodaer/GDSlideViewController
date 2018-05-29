@@ -15,6 +15,11 @@
 		3D566EF620BBF6E3007D51D2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566EF520BBF6E3007D51D2 /* main.m */; };
 		3D566F0020BBF6E3007D51D2 /* GDSlideViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566EFF20BBF6E3007D51D2 /* GDSlideViewControllerTests.m */; };
 		3D566F0B20BBF6E3007D51D2 /* GDSlideViewControllerUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F0A20BBF6E3007D51D2 /* GDSlideViewControllerUITests.m */; };
+		3D566F1A20BBFAB6007D51D2 /* GDScrollPageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F1920BBFAB6007D51D2 /* GDScrollPageView.m */; };
+		3D566F1E20BC1D78007D51D2 /* oneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F1D20BC1D78007D51D2 /* oneView.m */; };
+		3D566F2120BC1D81007D51D2 /* TwoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F2020BC1D81007D51D2 /* TwoView.m */; };
+		3D566F2420BC1D8B007D51D2 /* ThreeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F2320BC1D8B007D51D2 /* ThreeViewController.m */; };
+		3D566F2720BC1D91007D51D2 /* FourViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D566F2620BC1D91007D51D2 /* FourViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +56,16 @@
 		3D566F0620BBF6E3007D51D2 /* GDSlideViewControllerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GDSlideViewControllerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D566F0A20BBF6E3007D51D2 /* GDSlideViewControllerUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDSlideViewControllerUITests.m; sourceTree = "<group>"; };
 		3D566F0C20BBF6E3007D51D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3D566F1820BBFAB6007D51D2 /* GDScrollPageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GDScrollPageView.h; sourceTree = "<group>"; };
+		3D566F1920BBFAB6007D51D2 /* GDScrollPageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GDScrollPageView.m; sourceTree = "<group>"; };
+		3D566F1C20BC1D78007D51D2 /* oneView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oneView.h; sourceTree = "<group>"; };
+		3D566F1D20BC1D78007D51D2 /* oneView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = oneView.m; sourceTree = "<group>"; };
+		3D566F1F20BC1D81007D51D2 /* TwoView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TwoView.h; sourceTree = "<group>"; };
+		3D566F2020BC1D81007D51D2 /* TwoView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TwoView.m; sourceTree = "<group>"; };
+		3D566F2220BC1D8B007D51D2 /* ThreeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreeViewController.h; sourceTree = "<group>"; };
+		3D566F2320BC1D8B007D51D2 /* ThreeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThreeViewController.m; sourceTree = "<group>"; };
+		3D566F2520BC1D91007D51D2 /* FourViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FourViewController.h; sourceTree = "<group>"; };
+		3D566F2620BC1D91007D51D2 /* FourViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FourViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +120,9 @@
 				3D566EE720BBF6DA007D51D2 /* AppDelegate.m */,
 				3D566EE920BBF6DA007D51D2 /* ViewController.h */,
 				3D566EEA20BBF6DA007D51D2 /* ViewController.m */,
+				3D566F1820BBFAB6007D51D2 /* GDScrollPageView.h */,
+				3D566F1920BBFAB6007D51D2 /* GDScrollPageView.m */,
+				3D566F1B20BC1D6B007D51D2 /* New Group */,
 				3D566EEC20BBF6DA007D51D2 /* Main.storyboard */,
 				3D566EEF20BBF6E3007D51D2 /* Assets.xcassets */,
 				3D566EF120BBF6E3007D51D2 /* LaunchScreen.storyboard */,
@@ -130,6 +148,21 @@
 				3D566F0C20BBF6E3007D51D2 /* Info.plist */,
 			);
 			path = GDSlideViewControllerUITests;
+			sourceTree = "<group>";
+		};
+		3D566F1B20BC1D6B007D51D2 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+				3D566F1C20BC1D78007D51D2 /* oneView.h */,
+				3D566F1D20BC1D78007D51D2 /* oneView.m */,
+				3D566F1F20BC1D81007D51D2 /* TwoView.h */,
+				3D566F2020BC1D81007D51D2 /* TwoView.m */,
+				3D566F2220BC1D8B007D51D2 /* ThreeViewController.h */,
+				3D566F2320BC1D8B007D51D2 /* ThreeViewController.m */,
+				3D566F2520BC1D91007D51D2 /* FourViewController.h */,
+				3D566F2620BC1D91007D51D2 /* FourViewController.m */,
+			);
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -262,9 +295,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D566F1E20BC1D78007D51D2 /* oneView.m in Sources */,
+				3D566F2420BC1D8B007D51D2 /* ThreeViewController.m in Sources */,
+				3D566F2720BC1D91007D51D2 /* FourViewController.m in Sources */,
 				3D566EEB20BBF6DA007D51D2 /* ViewController.m in Sources */,
 				3D566EF620BBF6E3007D51D2 /* main.m in Sources */,
+				3D566F2120BC1D81007D51D2 /* TwoView.m in Sources */,
 				3D566EE820BBF6DA007D51D2 /* AppDelegate.m in Sources */,
+				3D566F1A20BBFAB6007D51D2 /* GDScrollPageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
