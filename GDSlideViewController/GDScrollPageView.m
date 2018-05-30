@@ -31,6 +31,7 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
 
 @property (nonatomic, strong) NSMutableArray *buttonArray;
 
+@property (nonatomic, strong) UIView *lineSpaceView;
 
 @end
 
@@ -52,6 +53,8 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         self.currentIndex = 0;
         self.lineWidth = 60;
         self.topDisPlayCount = 5;
+        self.topBgColor = [UIColor whiteColor];
+        self.topBottomSpaceInterval = 5;
     }
     return self;
 }
@@ -67,13 +70,13 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     [self createTopView];
     [self createContentView];
     
-
+    
     [self menuUpdate:self.currentIndex];
     [self menuScrollToCenter:self.currentIndex];
     [self contentScrollToCenter:self.currentIndex];
     [self moveToPage:self.currentIndex];
     self.lastIndex = self.currentIndex;
-
+    
 }
 #pragma mark - 在loadscrollview 之后调用
 - (void)jumpToWhatYouWant_AfterLoadScrollView_WithIndex:(NSInteger)index {
@@ -89,9 +92,13 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
 - (void)createBaseView {
     
     self.topView = [[UIView alloc] init];
+    self.topView.backgroundColor = self.topBgColor;
     self.topView.frame = CGRectMake(0, 0, ViewWidth, self.headerBarHeight);
     [self addSubview:self.topView];
     
+    self.lineSpaceView = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(self.topView.frame), ViewWidth, self.topBottomSpaceInterval)];
+    self.lineSpaceView.backgroundColor = [UIColor colorWithRed:244/255.0 green:244/255.0 blue:244/255.0 alpha:1];
+    [self addSubview:self.lineSpaceView];
     
     self.menuScrollView = [[UIScrollView alloc] init];
     self.menuScrollView.showsHorizontalScrollIndicator = NO;
@@ -101,7 +108,7 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     
     self.bottomLine = [[UIView alloc] init];
     self.bottomLine.backgroundColor = self.bottomLine_color;
-    self.bottomLine.frame = CGRectMake(0, CGRectGetMaxY(self.topView.frame), self.lineWidth, self.bottomLineHeight);
+    self.bottomLine.frame = CGRectMake(0, CGRectGetHeight(self.topView.frame)-self.bottomLineHeight, self.lineWidth, self.bottomLineHeight);
     [self.menuScrollView addSubview:self.bottomLine];
     self.bottomLine.hidden = YES;
     
@@ -112,7 +119,7 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     self.contentScrollView.delegate = self;
     self.contentScrollView.bounces = NO;
     [self addSubview:self.contentScrollView];
-    self.contentScrollView.frame = CGRectMake(0, CGRectGetMaxY(self.topView.frame), ViewWidth, ViewHeight-self.headerBarHeight);
+    self.contentScrollView.frame = CGRectMake(0, CGRectGetMaxY(self.topView.frame)+self.topBottomSpaceInterval, ViewWidth, ViewHeight-self.headerBarHeight-self.topBottomSpaceInterval);
     
 }
 #pragma mark - 上部的titles
@@ -127,17 +134,18 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         titleButton.tag = 10000 + i;
         [titleButton addTarget:self action:@selector(titleButtonClickAction:) forControlEvents:UIControlEventTouchUpInside];
         [self.menuScrollView addSubview:titleButton];
+        titleButton.titleLabel.font = self.title_font;
         if (i==self.currentIndex) {
             titleButton.selected = YES;
         }
         [_buttonArray addObject:titleButton];
     }
     self.menuScrollView.contentSize = CGSizeMake(itemWidth * self.titles.count, self.headerBarHeight);
-
+    
     if (self.showBottomLine) {
         self.bottomLine.frame = CGRectMake((self.currentIndex * itemWidth) + (itemWidth-self.lineWidth)/2, self.headerBarHeight-self.bottomLineHeight, self.lineWidth, self.bottomLineHeight);
         self.bottomLine.hidden = NO;
-
+        
     }else{
         self.bottomLine.hidden = YES;
     }
@@ -227,11 +235,11 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     left = left <= 0 ? 0 : left;
     CGFloat maxLeft = itemWidth * self.titles.count - ViewWidth;
     left = left >= maxLeft ? maxLeft : left;
-//    [self.menuScrollView scrollRectToVisible:CGRectMake(itemWidth * index, 0, itemWidth, self.headerBarHeight) animated:YES];
-//    [self.menuScrollView scrollRectToVisible:CGRectMake(left, 0, itemWidth, self.headerBarHeight) animated:YES];
+    //    [self.menuScrollView scrollRectToVisible:CGRectMake(itemWidth * index, 0, itemWidth, self.headerBarHeight) animated:YES];
+    //    [self.menuScrollView scrollRectToVisible:CGRectMake(left, 0, itemWidth, self.headerBarHeight) animated:YES];
     [self.menuScrollView setContentOffset:CGPointMake(left, 0) animated:YES];
-
-
+    
+    
 }
 
 - (void)moveToPage:(NSInteger)index {
@@ -256,11 +264,14 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     }else{
         //第一次进来
         id<GDScrollPageViewDelegate> currentVC = self.controllers[index];
-        if ([currentVC respondsToSelector:@selector(gd_scrollPageView:viewDidLoad:)]) {
-            [currentVC gd_scrollPageView:self viewDidLoad:index];
-        }
-        objc_setAssociatedObject(currentVC, (__bridge const void * _Nonnull)(gdscrollObjcID), @(YES), OBJC_ASSOCIATION_ASSIGN);
         
+        NSNumber *value = objc_getAssociatedObject(currentVC, (__bridge const void * _Nonnull)(gdscrollObjcID));
+        if (![value boolValue]) {
+            if ([currentVC respondsToSelector:@selector(gd_scrollPageView:viewDidLoad:)]) {
+                [currentVC gd_scrollPageView:self viewDidLoad:index];
+            }
+            objc_setAssociatedObject(currentVC, (__bridge const void * _Nonnull)(gdscrollObjcID), @(YES), OBJC_ASSOCIATION_ASSIGN);
+        }
         if ([currentVC respondsToSelector:@selector(gd_scrollPageView:viewDidAppear:)]) {
             [currentVC gd_scrollPageView:self viewDidAppear:index];
         }

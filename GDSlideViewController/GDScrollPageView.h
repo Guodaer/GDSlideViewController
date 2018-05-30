@@ -21,16 +21,16 @@
 
 @protocol GDScrollPageViewDelegate <NSObject>
 
-
+@optional
 /**
  滑动到当前vc的时候执行这个函数，所以子view的绘制都在这里，相当于view的init||vc的viewDidLoad
-
+ 
  @param scrollpageView scrollpageView
  @param index index
  */
 - (void)gd_scrollPageView:(GDScrollPageView *)scrollpageView viewDidLoad:(NSInteger)index;
 
-@optional
+
 
 - (void)gd_scrollPageView:(GDScrollPageView *)scrollpageView viewDidDisAppear:(NSInteger)index;
 
@@ -108,11 +108,19 @@
  */
 @property (nonatomic, assign) CGFloat lineWidth;
 
+@property (nonatomic, strong) UIColor *topBgColor;
+
 
 /**
  上部导航每页最多显示几个导航按钮  默认最多显示5个
  */
 @property (nonatomic, assign) NSInteger topDisPlayCount;
+
+
+/**
+ 上下的间隔  如果不想显示，就设成0
+ */
+@property (nonatomic, assign) CGFloat topBottomSpaceInterval;
 
 
 
@@ -127,10 +135,11 @@
  跳转到相对应的地方  index加了越界判断，此方法在loadScrollview之后调用
  创建的时候不知道跳到哪个index，所以就load之后再跳
  如果创建的时候就跳，那就应上面的方法 ‘currentIndex’
-
- @param index index 
+ 
+ @param index index
  */
 - (void)jumpToWhatYouWant_AfterLoadScrollView_WithIndex:(NSInteger)index;
 
 
 @end
+
