@@ -18,13 +18,13 @@
 }
 - (void)gd_scrollPageView:(GDScrollPageView *)scrollpageView viewDidLoad:(NSInteger)index {
     
-    NSLog(@"did load %ld",index);
+//    NSLog(@"did load %ld",index);
 }
 - (void)gd_scrollPageView:(GDScrollPageView *)scrollpageView viewDidAppear:(NSInteger)index {
-    NSLog(@"did appear %ld",index);
+//    NSLog(@"did appear %ld",index);
 }
 - (void)gd_scrollPageView:(GDScrollPageView *)scrollpageView viewDidDisAppear:(NSInteger)index {
-    NSLog(@"did disAppear %ld",index);
+//    NSLog(@"did disAppear %ld",index);
 }
 /*
 // Only override drawRect: if you perform custom drawing.

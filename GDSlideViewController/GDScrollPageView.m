@@ -33,6 +33,18 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
 
 @property (nonatomic, strong) UIView *lineSpaceView;
 
+/** 用于字体动画 颜色缩放 */
+@property (nonatomic, assign) NSInteger oldIndex;
+@property (nonatomic, assign) NSInteger newIndex;
+@property (nonatomic, assign) CGFloat oldOffSetx;//当前位置，判断左滑右滑
+
+@property (nonatomic, strong) NSArray *normalColorRGBA;
+@property (nonatomic, strong) NSArray *selectedColorRGBA;
+@property (nonatomic, strong) NSArray *deltaRGBA;
+
+/** menu最大scale */
+@property (assign, nonatomic) CGFloat titleBigScale;
+
 @end
 
 
@@ -43,8 +55,10 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         //gd_默认配置，别改这里，去改.h中的属性
         _buttonArray = [NSMutableArray array];
         self.title_font = [UIFont systemFontOfSize:14];
-        self.title_Color = [UIColor blackColor];
-        self.titleSelect_Color = [UIColor redColor];
+        //        self.title_Color = [UIColor blackColor];
+        self.title_Color = [UIColor colorWithRed:0/255.f green:0/255.f blue:0/255.f alpha:1];
+        //        self.titleSelect_Color = [UIColor redColor];
+        self.titleSelect_Color = [UIColor colorWithRed:255/255.f green:0/255.f blue:0/255.f alpha:1];
         self.showBottomLine = YES;
         self.bottomLineHeight = 2;
         self.headerBarHeight = 50;
@@ -55,6 +69,11 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         self.topDisPlayCount = 5;
         self.topBgColor = [UIColor whiteColor];
         self.topBottomSpaceInterval = 5;
+        
+        self.oldIndex = 0;
+        self.newIndex = 0;
+        self.oldOffSetx = 0;
+        self.titleBigScale = 1.2;
     }
     return self;
 }
@@ -71,7 +90,6 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     [self createContentView];
     
     
-    [self menuUpdate:self.currentIndex];
     [self menuScrollToCenter:self.currentIndex];
     [self contentScrollToCenter:self.currentIndex];
     [self moveToPage:self.currentIndex];
@@ -81,7 +99,7 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
 #pragma mark - 在loadscrollview 之后调用
 - (void)jumpToWhatYouWant_AfterLoadScrollView_WithIndex:(NSInteger)index {
     if (index < self.titles.count && index >=0 ) {
-        [self menuUpdate:index];
+        [self menuButtonAnimationWithOldIndex:self.lastIndex newIndex:index];
         [self menuScrollToCenter:index];
         [self contentScrollToCenter:index];
         [self moveToPage:index];
@@ -130,13 +148,14 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         titleButton.frame = CGRectMake(itemWidth * i, 0, itemWidth, CGRectGetHeight(self.menuScrollView.frame)-self.bottomLineHeight);
         [titleButton setTitle:self.titles[i] forState:UIControlStateNormal];
         [titleButton setTitleColor:self.title_Color forState:UIControlStateNormal];
-        [titleButton setTitleColor:self.titleSelect_Color forState:UIControlStateSelected];
+        //        [titleButton setTitleColor:self.titleSelect_Color forState:UIControlStateSelected];
         titleButton.tag = 10000 + i;
         [titleButton addTarget:self action:@selector(titleButtonClickAction:) forControlEvents:UIControlEventTouchUpInside];
         [self.menuScrollView addSubview:titleButton];
         titleButton.titleLabel.font = self.title_font;
         if (i==self.currentIndex) {
-            titleButton.selected = YES;
+            [titleButton setTitleColor:self.titleSelect_Color forState:UIControlStateNormal];
+            titleButton.transform = CGAffineTransformMakeScale(self.titleBigScale, self.titleBigScale);
         }
         [_buttonArray addObject:titleButton];
     }
@@ -175,7 +194,6 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     if (scrollView == self.contentScrollView) {
         NSInteger index = scrollView.contentOffset.x / ViewWidth;
         if (index != self.lastIndex) {
-            [self menuUpdate:index];
             [self menuScrollToCenter:index];
             [self moveToPage:index];
             self.lastIndex = index;
@@ -188,7 +206,107 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
         CGFloat offSetx = scrollView.contentOffset.x;
         CGFloat x = offSetx/CGRectGetWidth(self.menuScrollView.frame) * itemWidth + (itemWidth-self.lineWidth)/2;
         self.bottomLine.frame = CGRectMake(x, self.headerBarHeight-self.bottomLineHeight, self.lineWidth, self.bottomLineHeight);
+        
+        /** 以下是动态改变字体颜色 */
+        CGFloat tempProgress = scrollView.contentOffset.x / self.bounds.size.width;
+        NSInteger tempIndex = tempProgress;
+        CGFloat progress = tempProgress - floor(tempProgress);
+        CGFloat deltaX = scrollView.contentOffset.x - _oldOffSetx;
+        
+        if (deltaX > 0) {//向左
+            if (progress == 0.0) {
+                return;
+            }
+            self.newIndex = tempIndex + 1;//右边的将显示
+            self.oldIndex = tempIndex;
+        }else if(deltaX < 0){
+            progress = 1.0 - progress;
+            self.oldIndex = tempIndex + 1;
+            self.newIndex = tempIndex;
+        }else {return;}
+        
+        [self contentViewDidMoveFromIndex:_oldIndex toIndex:_newIndex progress:progress];
+        
     }
+}
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    _oldOffSetx = scrollView.contentOffset.x;
+}
+#pragma mark - 动态改变字体颜色
+- (void)contentViewDidMoveFromIndex:(NSInteger)fromIndex toIndex:(NSInteger)toIndex progress:(CGFloat)progress {
+    if (fromIndex < 0 ||
+        fromIndex >= self.titles.count ||
+        toIndex < 0 ||
+        toIndex >= self.titles.count) {
+        NSLog(@"------------------------ 参数有问题 ----------------------");
+        return;
+    }
+    UIButton *oldBtn = self.buttonArray[fromIndex];
+    UIButton *currentBtn = self.buttonArray[toIndex];
+    
+    
+    [oldBtn setTitleColor:[UIColor colorWithRed:[self.selectedColorRGBA[0] floatValue]+[self.deltaRGBA[0] floatValue] * progress
+                                          green:[self.selectedColorRGBA[1] floatValue]+[self.deltaRGBA[1] floatValue] * progress
+                                           blue:[self.selectedColorRGBA[2] floatValue]+[self.deltaRGBA[2] floatValue] * progress
+                                          alpha:[self.selectedColorRGBA[3] floatValue]+[self.deltaRGBA[3] floatValue] * progress]
+                 forState:UIControlStateNormal];
+    
+    [currentBtn setTitleColor:[UIColor colorWithRed:[self.normalColorRGBA[0] floatValue]-[self.deltaRGBA[0] floatValue] * progress
+                                              green:[self.normalColorRGBA[1] floatValue]-[self.deltaRGBA[1] floatValue] * progress
+                                               blue:[self.normalColorRGBA[2] floatValue]-[self.deltaRGBA[2] floatValue] * progress
+                                              alpha:[self.normalColorRGBA[3] floatValue]-[self.deltaRGBA[3] floatValue] * progress]
+                     forState:UIControlStateNormal];
+    
+    
+    
+    //放大缩小效果
+    CGFloat menuScale = self.titleBigScale - 1;
+    oldBtn.transform = CGAffineTransformMakeScale(self.titleBigScale-progress*menuScale,self.titleBigScale-progress*menuScale);
+    currentBtn.transform = CGAffineTransformMakeScale(1+menuScale*progress, 1+menuScale*progress);
+    
+}
+- (NSArray *)getColorRGBA:(UIColor *)color {
+    CGFloat numOfComponents = CGColorGetNumberOfComponents(color.CGColor);
+    NSArray *rgbaComponents = [[NSArray alloc] init];
+    if (numOfComponents == 4) {
+        const CGFloat *components = CGColorGetComponents(color.CGColor);
+        rgbaComponents = [NSArray arrayWithObjects:@(components[0]), @(components[1]), @(components[2]), @(components[3]), nil];
+    }
+    return rgbaComponents;
+}
+- (NSArray *)normalColorRGBA {
+    if (!_normalColorRGBA) {
+        NSArray *normalColorRGBA = [self getColorRGBA:self.title_Color];
+        NSAssert(normalColorRGBA, @"设置普通状态的文字颜色时 请使用RGBA空间的颜色值");
+        _normalColorRGBA = normalColorRGBA;
+        
+    }
+    return  _normalColorRGBA;
+}
+- (NSArray *)selectedColorRGBA {
+    if (!_selectedColorRGBA) {
+        NSArray *selectedColorRGBA = [self getColorRGBA:self.titleSelect_Color];
+        NSAssert(selectedColorRGBA, @"设置选中状态的文字颜色时 请使用RGBA空间的颜色值");
+        _selectedColorRGBA = selectedColorRGBA;
+        
+    }
+    return  _selectedColorRGBA;
+}
+- (NSArray *)deltaRGBA {
+    if (_deltaRGBA == nil) {
+        NSArray *normalColorRgb = self.normalColorRGBA;
+        NSArray *selectedColorRgb = self.selectedColorRGBA;
+        NSArray *delta;
+        if (normalColorRgb && selectedColorRgb) {
+            CGFloat deltaR = [normalColorRgb[0] floatValue] - [selectedColorRgb[0] floatValue];
+            CGFloat deltaG = [normalColorRgb[1] floatValue] - [selectedColorRgb[1] floatValue];
+            CGFloat deltaB = [normalColorRgb[2] floatValue] - [selectedColorRgb[2] floatValue];
+            CGFloat deltaA = [normalColorRgb[3] floatValue] - [selectedColorRgb[3] floatValue];
+            delta = [NSArray arrayWithObjects:@(deltaR), @(deltaG), @(deltaB), @(deltaA), nil];
+            _deltaRGBA = delta;
+        }
+    }
+    return _deltaRGBA;
 }
 #pragma mark - 获取top 的 itemWidth
 - (CGFloat)getTopItemWidth {
@@ -204,19 +322,26 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
 - (void)titleButtonClickAction:(UIButton *)sender {
     NSInteger index = sender.tag - 10000;
     if (self.lastIndex != index) {
-        [self menuUpdate:index];
+        _oldOffSetx = self.lastIndex * ViewWidth;
+        [self menuButtonAnimationWithOldIndex:self.lastIndex newIndex:index];
         [self menuScrollToCenter:index];
         [self contentScrollToCenter:index];
         [self moveToPage:index];
         self.lastIndex = index;
     }
 }
-//按钮修改
-- (void)menuUpdate:(NSInteger)index {
-    UIButton *lastButton = self.buttonArray[self.lastIndex];
-    lastButton.selected = NO;
-    UIButton *currentButton = self.buttonArray[index];
-    currentButton.selected = YES;
+#pragma mark - 按钮改变状态
+- (void)menuButtonAnimationWithOldIndex:(NSInteger)oldIndex newIndex:(NSInteger)newIndex {
+    UIButton *oldBtn = self.buttonArray[oldIndex];
+    UIButton *currentBtn = self.buttonArray[newIndex];
+    [oldBtn setTitleColor:self.title_Color forState:UIControlStateNormal];
+    [currentBtn setTitleColor:self.titleSelect_Color forState:UIControlStateNormal];
+    
+    CGFloat menuScale = self.titleBigScale - 1;
+    [UIView animateWithDuration:0.2 animations:^{
+        oldBtn.transform = CGAffineTransformMakeScale(self.titleBigScale-menuScale,self.titleBigScale-menuScale);
+        currentBtn.transform = CGAffineTransformMakeScale(1+menuScale, 1+menuScale);
+    }];
 }
 //content滚动到中间
 - (void)contentScrollToCenter:(NSInteger)index {
@@ -235,8 +360,6 @@ NSString * const gdscrollObjcID = @"gdscrollObjcID";
     left = left <= 0 ? 0 : left;
     CGFloat maxLeft = itemWidth * self.titles.count - ViewWidth;
     left = left >= maxLeft ? maxLeft : left;
-    //    [self.menuScrollView scrollRectToVisible:CGRectMake(itemWidth * index, 0, itemWidth, self.headerBarHeight) animated:YES];
-    //    [self.menuScrollView scrollRectToVisible:CGRectMake(left, 0, itemWidth, self.headerBarHeight) animated:YES];
     [self.menuScrollView setContentOffset:CGPointMake(left, 0) animated:YES];
     
     
