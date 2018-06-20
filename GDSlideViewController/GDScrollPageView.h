@@ -54,7 +54,7 @@
 /**
  view的父试图  **********  如果controllers中有 controller  一定要传superVC
  */
-@property (nonatomic, strong) UIViewController *superVC;
+@property (nonatomic, weak) UIViewController *superVC;
 
 /**
  顶部menu     **********
